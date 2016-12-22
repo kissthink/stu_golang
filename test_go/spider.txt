@@ -1,0 +1,12 @@
+1.搜索
+https://play.google.com/store/search?q=facebook
+2.查询页面显示app列表
+id-card-list card-list two-cards
+	div
+	div
+
+3.img
+	class="card-content id-track-click id-track-impression"
+	
+
+	1.<a>
