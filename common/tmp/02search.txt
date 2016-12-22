@@ -1,0 +1,13 @@
+
+➜  common git:(master) ✗ time go run 002search_filter_app_name.go
+just wait ...2016/12/22 22:21:34 https://play.google.com/store/search?q=陌陌
+2016/12/22 22:21:34 https://play.google.com/store/search?q=wechat
+2016/12/22 22:21:34 https://play.google.com/store/search?q=qq
+2016/12/22 22:21:34 https://play.google.com/store/search?q=facebook
+qq: 120
+data: qq
+wechat: 88
+data: wechat
+facebook: 200
+data: facebook
+go run 002search_filter_app_name.go  0.59s user 0.16s system 18% cpu 4.078 total

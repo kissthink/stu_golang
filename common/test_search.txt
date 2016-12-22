@@ -1,0 +1,6 @@
+➜  common git:(master) ✗ go run 001search.go
+2016/12/22 21:42:43 https://play.google.com/store/search?q=facebook
+sum:50 5049
+2016/12/22 21:42:45 https://play.google.com/store/search?q=qq
+sum:3030%  
+➜  common git:(master) ✗ 
