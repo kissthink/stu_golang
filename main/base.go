@@ -14,103 +14,109 @@ import (
 )
 
 func main() {
-	htmljs, err1 := simplejson.NewJson([]byte(`{}`))
-	if err1 != nil {
-		panic(err1)
-		return
-	}
-
-	htmljs.Set("name", "qq")
-
-	app_name, err2 := htmljs.Get("name").String()
-	if err2 != nil {
-		panic(err2)
-		return
-	}
-	fmt.Println("app_name",app_name)
-
-	htmljs.SetPath([]string{"foo", "bar"}, "baz")
-
-
-	var lst liststring.ListString
-	lst.Append("hello")
-	fmt.Println("%v (len: %d)", lst, lst.Len()) // [1] (len: 1)
-
-	lst.Append("hello")
-	fmt.Println("%v (len: %d)", lst, lst.Len()) // [1] (len: 1)
-
-
-
 	hc := common.NewHttpClient("https://p.xgj.me:27035")
 	if hc == nil {
 		log.Println("NewHttpClient..err")
 		return
 	}
 
-	ret_list, err := search("facebook", hc)
+	//search
+	appListJs, err := simplejson.NewJson([]byte(`{}`))
 	if err != nil {
+		panic(err)
 		return
 	}
-	fmt.Println("facebook:", len(ret_list))
-}
-
-
-func Test_search(t *testing.T) {
-	hc := common.NewHttpClient("https://p.xgj.me:27035")
-	if hc == nil {
-		log.Println("NewHttpClient..err")
-		return
-	}
-	query_arry := []string{"facebook", "qq", "wechat", "陌陌"}
-
-	data := make(chan string, len(query_arry))
-
-	for _, app := range query_arry {
-		go work(app, hc, data)
-		//ret_list, err := search(app, hc)
-		//if err != nil{
-		//	return
-		//}
-		//fmt.Println(fmt.Sprintf("%s: %d", app,len(ret_list)))
-	}
-	print("just wait ...")
-	num := 1
-	for {
-		fmt.Println("data:", <-data)
-		num += 1
-		if num == 4 {
-			break
-		}
-		//time.Sleep(1e9)
-		//fmt.Println("wait..")
-	}
-}
-func work(app string, hc *common.HttpClient, data chan string) {
-
-	ret_list, err := search(app, hc)
+	appListJs, err = search("facebook", hc)
 	if err != nil {
-		data <- fmt.Sprint("%s..err", app)
+		panic(err)
 		return
 	}
-	data <- app
-	fmt.Println(fmt.Sprintf("%s: %d", app, len(ret_list)))
-}
 
+	fmt.Println(appListJs)
+
+	//for-range
+	//appUrl, err1 := appListJs.Get("0").String()
+	//if err1 != nil{
+	//	panic(err1)
+	//	return
+	//}
+	//
+	////detail
+	//appDetailJs, err := simplejson.NewJson([]byte(`{}`))
+	//if err != nil {
+	//	panic(err)
+	//	return
+	//}
+	//appDetailJs, err = detail(appUrl, hc)
+	//if err != nil {
+	//	panic(err)
+	//	return
+	//}
+	//
+	//fmt.Println(appDetailJs)
+
+}
 /////////////////////////
 //查询页面接口：
 //例如	:
 //		search("facebook") int {}
 //return:
 //		查询结果数量 & img_src_list
-func search(query_app string, hc *common.HttpClient) (query_app_slice []string, err error) {
+func search(query_app string, hc *common.HttpClient) (*simplejson.Json, error) {
 
 	if len(query_app) <= 0 {
-		return query_app_slice, nil
+		return nil, nil
 	}
 
 	// url_base := "https://play.google.com/store/search?q=facebook"
 	url_base := "https://play.google.com/store/search"
 	url := fmt.Sprintf("%s?q=%s", url_base, query_app)
+	log.Println(url)
+	req, e := http.NewRequest(
+		"GET",
+		url,
+		nil,
+	)
+
+	resp, e := hc.Do(req)
+	if e != nil {
+		panic(e)
+		return nil, nil
+	}
+
+	// Create and fill the document, defer res.Body.Close()
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		panic(err)
+		return nil, nil
+	}
+	//f, err1 := os.OpenFile(fmt.Sprintf("./test_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	//if err1 != nil {
+	//	panic(err1)
+	//	return nil, nil
+	//}
+	//defer f.Close()
+	sum := 0
+	doc.Find(".cover-image").Each(func(i int, contentSelection *goquery.Selection) {
+
+		sum += 1
+		if sum >= 100 {
+			return
+		}
+	})
+}
+
+
+
+
+func detail(app_id string, hc *common.HttpClient) (query_app_slice []string, err error) {
+	if len(app_id) <= 0 {
+		return query_app_slice, nil
+	}
+
+	//https://play.google.com/store/apps/details?id=com.facebook.Mentions
+	url_base := "https://play.google.com/store/search"
+	url := fmt.Sprintf("%s?q=%s", url_base, app_id)
 	log.Println(url)
 	req, e := http.NewRequest(
 		"GET",
@@ -130,7 +136,7 @@ func search(query_app string, hc *common.HttpClient) (query_app_slice []string, 
 		panic(err)
 		return query_app_slice, nil
 	}
-	f, err1 := os.OpenFile(fmt.Sprintf("./test_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	f, err1 := os.OpenFile(fmt.Sprintf("./test_%s.txt", app_id), os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err1 != nil {
 		panic(err1)
 		return query_app_slice, nil
@@ -147,7 +153,7 @@ func search(query_app string, hc *common.HttpClient) (query_app_slice []string, 
 		// if !strings.HasSuffix(title, "&hl=zh_CN") {
 		// 	title = title + "&hl=zh-CN"
 		// }
-		log.Println("第", i, ":", query_app,  ":", app_deatil_url)
+		log.Println("第", i, ":", app_id,  ":", app_deatil_url)
 		//he
 		// query_app_slice = append(query_app_slice, title)
 		// f.WriteString(title)

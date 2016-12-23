@@ -1,4 +1,4 @@
-package dev
+package liststring
 
 type ListString []string
 func (l ListString) Len() int        { return len(l) }

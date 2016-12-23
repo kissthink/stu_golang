@@ -105,7 +105,7 @@ func search(query_app string, hc *HttpClient) (query_app_slice []string, err err
 		panic(err)
 		return query_app_slice, nil
 	}
-	f, err1 := os.OpenFile(fmt.Sprintf("./tmp/serch_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	f, err1 := os.OpenFile(fmt.Sprintf("./serch_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err1 != nil {
 		panic(err1)
 		return query_app_slice, nil
@@ -121,7 +121,7 @@ func search(query_app string, hc *HttpClient) (query_app_slice []string, err err
 		if !strings.HasSuffix(title, "-rw") {
 			title = title + "-rw"
 		}
-		//log.Println("第", i, "img-src", title)
+		log.Println("第", i, "img-src", title)
 		query_app_slice = append(query_app_slice, title)
 		f.WriteString(title)
 		f.WriteString("\n")
