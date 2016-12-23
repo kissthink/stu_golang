@@ -1,17 +1,25 @@
 package main
 
 import (
-	"context"
-	"github.com/PuerkitoBio/goquery"
-	"log"
 	"net"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
-	"os"
+
 	"strings"
+
+	"net/http/cookiejar"
 	"time"
-	"fmt"
+
+	"context"
+	//"io/ioutil"
+	"log"
+	//"os"
+	//add by hyh
+	//"golang.org/x/net/html"
+	"github.com/PuerkitoBio/goquery"
+	//"go/doc"
+	//"strconv"
+	"os"
 )
 
 type HttpClient struct {
@@ -33,130 +41,60 @@ type TimeoutConn struct {
 
 /////////////////////////
 //test main
-func Test_search(){
-
-	hc := NewHttpClient("https://p.xgj.me:27035")
-	if hc == nil {
-		log.Println("NewHttpClient..err")
-		return
-	}
-	query_arry := [] string{"facebook", "qq", "wechat", "陌陌"}
-
-	data := make(chan string, len(query_arry))
-
-	for _, app := range query_arry{
-		go work(app, hc, data)
-		//ret_list, err := search(app, hc)
-		//if err != nil{
-		//	return
-		//}
-		//fmt.Println(fmt.Sprintf("%s: %d", app,len(ret_list)))
-	}
-	print("just wait ...")
-	num := 1
-	for {
-		fmt.Println("data:", <-data)
-		num +=1
-		if num == 4 {
-			break
-		}
-		//time.Sleep(1e9)
-		//fmt.Println("wait..")
-	}
-}
-
 func main() {
-	//hc := NewHttpClient("https://p.xgj.me:27035")
-	//if hc == nil {
-	//	log.Println("NewHttpClient..err")
-	//	return
-	//}
-	//
-	//ret_list, err := search("facebook", hc)
-	//if err != nil{
-	//	return
-	//}
-	//fmt.Println("facebook:",len(ret_list))
-
-	Test_search()
-}
-func work(app string, hc *HttpClient, data chan string){
-
-
-	ret_list, err := search(app, hc)
-	if err != nil{
-		data<-fmt.Sprint("%s..err", app)
-		return
-	}
-	data<-app
-	fmt.Println(fmt.Sprintf("%s: %d", app,len(ret_list)))
-}
-/////////////////////////
-//查询页面接口：
-//例如	:
-//		search("facebook") int {}
-//return:
-//		查询结果数量 & img_src_list
-func search(query_app string, hc *HttpClient) (query_app_slice []string, err error){
-
-	if len(query_app) <= 0{
-		return query_app_slice,nil
-	}
-
-	// url_base := "https://play.google.com/store/search?q=facebook"
-	url_base := "https://play.google.com/store/search"
-	url := fmt.Sprintf("%s?q=%s", url_base, query_app)
-	log.Println(url)
+	hc := NewHttpClient("https://p.xgj.me:27035")
+	//hc := NewHttpClient("ip://192.168.1.102")
+	//hc := NewHttpClient("ip://[2607:5300:60:6566::]")
+	//url := "https://www.google.com"
+	url := "https://play.google.com/store/search?q=facebook"
 	req, e := http.NewRequest(
 		"GET",
 		url,
 		nil,
 	)
-
 	resp, e := hc.Do(req)
 	if e != nil {
 		panic(e)
-		return  query_app_slice, nil
+		return
 	}
-
-	// Create and fill the document, defer res.Body.Close()
+	// Create and fill the document
 	doc, err := goquery.NewDocumentFromResponse(resp)
 	if err != nil {
-		panic(err)
-		return query_app_slice, nil
+		log.Fatal(err)
 	}
-	f, err1 := os.OpenFile(fmt.Sprintf("./tmp/002tmp/search_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
+
+	f, err1 := os.OpenFile("search_faceboo.txt", os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err1 != nil {
 		panic(err1)
-		return query_app_slice, nil
+		return
 	}
 	defer f.Close()
 
-	sum := 0
-	doc.Find(".card-click-target").Each(func(i int, contentSelection *goquery.Selection) {
-		title, _ := contentSelection.Attr("href")
+	doc.Find(".cover-image").Each(func(i int, contentSelection *goquery.Selection) {
+		title, _ := contentSelection.Attr("src")
 		if !strings.HasPrefix(title, "https:") {
 			title = "https:" + title
 		}
+		//google自己的网页上有 -rw 不知道why?
+		//测试:
+		//	加 -rw	:可以访问
+		//	不加 -rw	:可以访问
+		//	加-rw 与google保持一致. (https://play.google.com/store/search?q=facebook)
+		//测试方法：
+		//	1.list_e = $(".cover-image")
+		//	2.list_e[1].currentSrc
+		//	3."https://lh3.googleusercontent.com/GWfQhWY8bFwJipJZW5zdZ3EPG7oOP88diyyDzYVDJGZde7EcKsF9LbVXETD0RZtusM9R=w170-rw"
 		if !strings.HasSuffix(title, "-rw") {
 			title = title + "-rw"
 		}
-		log.Println("第", i, "img-src", title)
-		query_app_slice = append(query_app_slice, title)
+
+		// log.Println("第", i, "img-src", title)
 		f.WriteString(title)
 		f.WriteString("\n")
-		sum += 1
-		if sum >= 100 {
-			return
-		}
 	})
-	//topicsSelection := doc.Find(".cover-image")
-	//print(topicsSelection.Length())
-
-	//fmt.Print("sum:", sum, len(query_app_slice))
-	return query_app_slice[0:len(query_app_slice)], nil
+	topicsSelection := doc.Find(".cover-image")
+	print(topicsSelection.Length())
 }
-
 
 /////////////////////////
 //使用自定义出口协议,注意,前缀要全部使用小写
@@ -315,4 +253,3 @@ func (hc *HttpClient) GetCookie(u *url.URL, key string) *http.Cookie {
 	}
 	return nil
 }
-

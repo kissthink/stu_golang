@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net"
@@ -11,7 +12,6 @@ import (
 	"os"
 	"strings"
 	"time"
-	"fmt"
 )
 
 type HttpClient struct {
@@ -26,25 +26,63 @@ const (
 
 // Conn wraps a net.Conn, and sets a deadline for every read
 // and write operation.
+
+
 type TimeoutConn struct {
 	net.Conn
 	IdleTimeout time.Duration
 }
+//////////////////////////
+//hyh
+type ListString []string
+func (l ListString) Len() int        { return len(l) }
+func (l *ListString) Append(val string) { *l = append(*l, val) }
+
+type AppInfo struct {
+	
+}
+type AppDetail struct {
+	//
+	Info	AppInfo		`josn info`
+	//有多个图片
+	Screen  ListString	`json screen`
+	//一段html
+	Desc	string		`json desc`
+}
+//detail 页面的四三大块
+type MainContent struct {
+	AppName string		`json app_name`
+	AppInfo AppDetail	`json app_info`
+	Change	ListString	`json change`
+	Other	ListString	`json other`
+}
 
 /////////////////////////
-//test main
-func Test_search(){
+func Test_ListString(){
+	// 值
+	var lst ListString
+	lst.Append("hello")
+	fmt.Println("%v (len: %d)", lst, lst.Len()) // [1] (len: 1)
 
+	lst.Append("hello")
+	fmt.Println("%v (len: %d)", lst, lst.Len()) // [1] (len: 1)
+	// 指针
+	plst := new(ListString)
+	plst.Append("word")
+	fmt.Println("%v (len: %d)", plst, plst.Len()) // &[2] (len: 1)
+}
+//test main
+func Test_search() {
 	hc := NewHttpClient("https://p.xgj.me:27035")
 	if hc == nil {
 		log.Println("NewHttpClient..err")
 		return
 	}
-	query_arry := [] string{"facebook", "qq", "wechat", "陌陌"}
+	query_arry := []string{"facebook", "qq", "wechat", "陌陌"}
 
 	data := make(chan string, len(query_arry))
 
-	for _, app := range query_arry{
+	for _, app := range query_arry {
 		go work(app, hc, data)
 		//ret_list, err := search(app, hc)
 		//if err != nil{
@@ -56,7 +94,7 @@ func Test_search(){
 	num := 1
 	for {
 		fmt.Println("data:", <-data)
-		num +=1
+		num += 1
 		if num == 4 {
 			break
 		}
@@ -66,6 +104,7 @@ func Test_search(){
 }
 
 func main() {
+	Test_ListString()
 	//hc := NewHttpClient("https://p.xgj.me:27035")
 	//if hc == nil {
 	//	log.Println("NewHttpClient..err")
@@ -73,34 +112,34 @@ func main() {
 	//}
 	//
 	//ret_list, err := search("facebook", hc)
-	//if err != nil{
+	//if err != nil {
 	//	return
 	//}
-	//fmt.Println("facebook:",len(ret_list))
+	//fmt.Println("facebook:", len(ret_list))
 
-	Test_search()
+	// Test_search()
 }
-func work(app string, hc *HttpClient, data chan string){
-
+func work(app string, hc *HttpClient, data chan string) {
 
 	ret_list, err := search(app, hc)
-	if err != nil{
-		data<-fmt.Sprint("%s..err", app)
+	if err != nil {
+		data <- fmt.Sprint("%s..err", app)
 		return
 	}
-	data<-app
-	fmt.Println(fmt.Sprintf("%s: %d", app,len(ret_list)))
+	data <- app
+	fmt.Println(fmt.Sprintf("%s: %d", app, len(ret_list)))
 }
+
 /////////////////////////
 //查询页面接口：
 //例如	:
 //		search("facebook") int {}
 //return:
 //		查询结果数量 & img_src_list
-func search(query_app string, hc *HttpClient) (query_app_slice []string, err error){
+func search(query_app string, hc *HttpClient) (query_app_slice []string, err error) {
 
-	if len(query_app) <= 0{
-		return query_app_slice,nil
+	if len(query_app) <= 0 {
+		return query_app_slice, nil
 	}
 
 	// url_base := "https://play.google.com/store/search?q=facebook"
@@ -116,7 +155,7 @@ func search(query_app string, hc *HttpClient) (query_app_slice []string, err err
 	resp, e := hc.Do(req)
 	if e != nil {
 		panic(e)
-		return  query_app_slice, nil
+		return query_app_slice, nil
 	}
 
 	// Create and fill the document, defer res.Body.Close()
@@ -125,7 +164,7 @@ func search(query_app string, hc *HttpClient) (query_app_slice []string, err err
 		panic(err)
 		return query_app_slice, nil
 	}
-	f, err1 := os.OpenFile(fmt.Sprintf("./tmp/002tmp/search_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
+	f, err1 := os.OpenFile(fmt.Sprintf("./test_%s.txt", query_app), os.O_WRONLY|os.O_CREATE, os.ModePerm)
 	if err1 != nil {
 		panic(err1)
 		return query_app_slice, nil
@@ -133,30 +172,31 @@ func search(query_app string, hc *HttpClient) (query_app_slice []string, err err
 	defer f.Close()
 
 	sum := 0
-	doc.Find(".card-click-target").Each(func(i int, contentSelection *goquery.Selection) {
-		title, _ := contentSelection.Attr("href")
-		if !strings.HasPrefix(title, "https:") {
-			title = "https:" + title
-		}
-		if !strings.HasSuffix(title, "-rw") {
-			title = title + "-rw"
-		}
-		log.Println("第", i, "img-src", title)
-		query_app_slice = append(query_app_slice, title)
-		f.WriteString(title)
-		f.WriteString("\n")
+	doc.Find(".card-content").Each(func(i int, contentSelection *goquery.Selection) {
+		app_deatil_url,_ := contentSelection.ChildrenFiltered(".card-click-target").Attr("href")
+		 if !strings.HasPrefix(app_deatil_url, "https:") {
+			 app_deatil_url = "https://play.google.com" + app_deatil_url
+		 }
+		//&hl=zh_CN
+		// if !strings.HasSuffix(title, "&hl=zh_CN") {
+		// 	title = title + "&hl=zh-CN"
+		// }
+		log.Println("第", i, ":", query_app,  ":", app_deatil_url)
+		//he
+		// query_app_slice = append(query_app_slice, title)
+		// f.WriteString(title)
+		// f.WriteString("\n")
 		sum += 1
 		if sum >= 100 {
 			return
 		}
 	})
-	//topicsSelection := doc.Find(".cover-image")
-	//print(topicsSelection.Length())
+	topicsSelection := doc.Find(".card .apps")
+	print(topicsSelection.Length())
 
-	//fmt.Print("sum:", sum, len(query_app_slice))
+	fmt.Print("sum:", sum, len(query_app_slice))
 	return query_app_slice[0:len(query_app_slice)], nil
 }
-
 
 /////////////////////////
 //使用自定义出口协议,注意,前缀要全部使用小写
@@ -315,4 +355,3 @@ func (hc *HttpClient) GetCookie(u *url.URL, key string) *http.Cookie {
 	}
 	return nil
 }
-
