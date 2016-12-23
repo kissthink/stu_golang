@@ -1,0 +1,46 @@
+{
+    "name": "QQ", 
+    "icon": "//lh3.ggpht.com/77YErpfiXE3GecNW2Q8CwC3jCKw0A7mgq3TUNzoSmVDOlg5hUl5mGBFpd9Mud5r4gyc=w300-rw", 
+    "translation_bar": " <span class=\"translation-icon\"></span> <span class=\"translation-bar-arrow\"></span> <span jsname=\"IPektc\"> Translate the description into <span>English</span> using Google Translate? </span> <span jsname=\"PvdxP\" style=\"display:none\"> Translate the description back to <span>Chinese</span> </span> <div jsname=\"BZxE4c\" class=\"play-button small\" jsaction=\"ornU0b\"> Translate </div> ", 
+    "description_translation": "----- QQ · Music in communication -----<p>√ serves more than 90 percent of mobile Internet users<br>√ multiplayer video, file transfer multiport mutual innovate to meet the required communication<br>√ committed to creating unlimited joy of communication, entertainment and life experience</p><p>The main function ----- -----</p><p>· Chat message: send and receive messages anywhere and group friends, touch up.<br>· Voice calls: two, more than voice calls, high-definition and chat.<br>* Video Chat: friends and family, and I miss not as good as each other.<br>* File transfer: cell phones, computers multiport pass each other easily and quickly.<br>· Space News: Faster informed friends dynamic, shared life to keep moving.<br>· Personalized dress: Topic, business cards, ringtones, bubbles, hanging freely choose.<br>* Game Center: every day, all the people and other popular mobile games, do not stop.<br>· Mobile payments: prepaid recharge, online shopping, payment transfers, everything.</p><p>Fun in communication for 16 years, 800 million people happy chat!</p><p>----- Contact us -----</p><p>If you have any problem with the process, please contact us:<br>- Online help: Go QQ Settings -> About QQ -> Help and Feedback<br>- Customer service hotline: 0755-83763333 (Hours: 8:00 - 23:00)</p>", 
+    "description": "-----QQ·乐在沟通-----<p>√服务超过90%的移动互联网用户<br>√多人视频、文件多端互传，不断创新满足沟通所需<br>√致力于打造欢乐无限的沟通、娱乐与生活体验</p><p>-----主要功能-----</p><p>·聊天消息：随时随地收发好友和群消息，一触即达。<br>·语音通话：两人、多人语音通话，高清畅聊。<br>·视频聊天：亲朋好友，想念不如相见。<br>·文件传输：手机、电脑多端互传，方便快捷。<br>·空间动态：更快获知好友动态，分享生活留住感动。<br>·个性装扮：主题、名片、彩铃、气泡、挂件自由选。<br>·游戏中心：天天、全民等最热手游，根本停不下来。<br>·移动支付：话费充值、网购、转账收款，一应俱全。</p><p>乐在沟通16年，聊天欢乐8亿人！</p><p>-----联系我们-----</p><p>如在使用过程中遇到任何问题，请联系我们：<br>- 在线帮助：进入QQ设置 -> 关于QQ -> 帮助与反馈<br>- 客服热线：0755-83763333 (服务时间：8:00 - 23:00)</p>", 
+    "description_short": "Fun in communication for 16 years, 800 million people happy chat!", 
+    "img": [
+        "//lh3.googleusercontent.com/brMnF1_ZKV06-JV4NCfOUb1kLQp8PJMotOyT4BPYF7R1JGnxt6lMLrxQEjtFZiLmOUwg=h310-rw", 
+        "//lh3.googleusercontent.com/W5scbXhJJNSFkVQ8-nOjDnllkRcQVLEYiMfz03wa6kx9DFoKQ5z07ANzwcGqt3X7qA=h310-rw", 
+        "//lh3.googleusercontent.com/PKrz3R2kuxzvFgxv6gAtvO9sNjyNdH-Vx93P9nDg27emG40fPO966yZpNz1DUiVJ-Tw=h310-rw"
+    ], 
+    "tube": "", 
+    "tube_id": "", 
+    "version_description": "1.群通话管理，有序发言，掌控全场2.视频电话“儿童锁”，避免误操作，和熊孩子一起视频吧3.修复在Android 6.0系统上的部分兼容问题", 
+    "category": "COMMUNICATION", 
+    "apk_type": 1, 
+    "price": "0", 
+    "developer": "Tencent Technology (Shenzhen) Company Ltd.", 
+    "developer_link": [
+        {
+            "name": "Visit website", 
+            "href": "https://www.google.com/url?q=http://mobile.qq.com/&sa=D&usg=AFQjCNEN5V0oMGePhsKkdW9W5cITC-7GYA"
+        }, 
+        {
+            "name": "Email SERVICE@TENCENT.COM", 
+            "href": "mailto:SERVICE@TENCENT.COM"
+        }
+    ], 
+    "review_stars": 3.8, 
+    "review_count": 124067, 
+    "install_count1": 10000000, 
+    "install_count2": 50000000, 
+    "content_rating": [
+        "Everyone"
+    ], 
+    "interactive_elements": [
+        "Users Interact", 
+        "Shares Location"
+    ], 
+    "published": true, 
+    "updated": "2016-05-06T00:00:00+08:00", 
+    "version_size": "", 
+    "version_current_version": "5.9.7", 
+    "version_requires_android": "2.2 and up"
+}
