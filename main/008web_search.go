@@ -84,11 +84,11 @@ func AppSearch(w http.ResponseWriter, r *http.Request) {
 //detail_url: "https://play.google.com/store/apps/details?id=com.tencent.mm",
 func AppDetail(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()                    //解析url传递的参数，对于POST则解析响应包的主体（request body）
-	log.Println("method:", r.Method) //获取请求的方法
+	log.Println("detail-view:---->method:", r.Method) //获取请求的方法
 	if r.Method == "GET" {
 		id := r.Form.Get("id")
 		hl := r.Form.Get("hl")
-		log.Println("detail args:", id, hl)
+		log.Println("args:", id, hl)
 		appdetail, err := detail(id, hl)
 		if err != nil {
 			panic(err)
@@ -202,6 +202,45 @@ func search(query_app string) ([]*AppInfo, error) {
 }
 
 func detail(id string, hr string) ([]*AppInfoDetail, error) {
-	log.Println("id:", id, "hr:", hr)
+	log.Println("detail--->","id:", id, "hr:", hr)
+
+	url_base := "https://play.google.com/store/apps/details"
+	var url string
+	if len(id) > 0 {
+		url = fmt.Sprintf("%s%s%s", url_base,"?id=", id)
+	}
+
+	if len(hr) > 0 {
+		url = fmt.Sprintf("%s%s%s", url_base,"&hr=", id)
+	}
+
+	hc := common.NewHttpClient("https://p.xgj.me:27035")
+	if hc == nil {
+		log.Println("NewHttpClient..err")
+		return nil, nil
+	}
+
+	log.Println("details_url:",url)
+	req, e := http.NewRequest(
+		"GET",
+		url,
+		nil,
+	)
+
+	resp, e := hc.Do(req)
+	if e != nil {
+		panic(e)
+		return nil, e
+	}
+
+	// Create and fill the document, defer res.Body.Close()
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		panic(err)
+		return nil, nil
+	}
+
+	print(doc)
+
 	return nil, nil
 }
