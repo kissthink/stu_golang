@@ -8,7 +8,10 @@ import (
 	"net/http"
 	"strings"
 	"user/common"
+	"user/dev"
 )
+
+type lstring liststring.ListString
 
 type AppInfo struct {
 	Developer    string `json:"developer"`
@@ -19,7 +22,32 @@ type AppInfo struct {
 	Review_stars string `json:"review_stars"`
 }
 type AppInfoDetail struct {
-	Developer    string `json:"developer"`
+	Apk_type		string	`json:"apk_type"`
+	Content_rating		lstring	`json:"content_rating"`
+	Category		string	`json:"category"`
+	Description 		string	`json:"description"`
+	Description_short 	string	`json:"description_short"`
+	Description_ranslation	string	`json:"description_ranslation"`
+	Developer		string	`json:"developer"`
+	Developer_link		string	`json:"developer_link"`
+	Name         		string	`json:"name"`
+	Img			lstring	`json:"img"`
+	Icon         		string	`json:"icon"`
+	Install_count1		int	`json:"install_count_1"`
+	Install_count2		int	`json:"install_count_2"`
+	Interactive_elements	lstring	`json:"interactive_elements"`
+	In_app_products		string	`json:"in_app_products"`
+	Price			string	`json:"price"`
+	Review_starts		float32	`json:"review_starts"`
+	Review_count		int	`json:"review_count"`
+	Published		bool	`json:"published"`
+	Tube			string	`json:"tube"`
+	Tube_id			string	`json:"tube_id"`
+	Update			string	`json:"update"`
+	Version_description	string	`json:"version_description"`
+	Version_size		string	`json:"version_size"`
+	Version_current_version	string	`json:"version_current_version"`
+	Version_requires_android string	`json:"version_requires_android"`
 }
 
 func main() {
@@ -174,5 +202,6 @@ func search(query_app string) ([]*AppInfo, error) {
 }
 
 func detail(id string, hr string) ([]*AppInfoDetail, error) {
+	log.Println("id:", id, "hr:", hr)
 	return nil, nil
 }
