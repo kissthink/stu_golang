@@ -1,0 +1,3 @@
+package: webgp
+import:
+- package: github.com/PuerkitoBio/goquery
