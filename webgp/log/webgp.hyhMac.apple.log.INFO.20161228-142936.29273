@@ -1,0 +1,18 @@
+Log file created at: 2016/12/28 14:29:36
+Running on machine: hyhMac
+Binary: Built with gc go1.7.4 for darwin/amd64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I1228 14:29:36.354014   29273 main.go:73] StartWebSer...start
+I1228 14:29:42.257010   29273 main.go:216] 10app_stars not exist'
+I1228 14:29:42.257202   29273 main.go:216] 12app_stars not exist'
+I1228 14:29:42.257298   29273 main.go:216] 13app_stars not exist'
+I1228 14:29:42.257388   29273 main.go:216] 14app_stars not exist'
+I1228 14:29:42.257478   29273 main.go:216] 15app_stars not exist'
+I1228 14:29:42.257661   29273 main.go:216] 17app_stars not exist'
+I1228 14:29:42.257751   29273 main.go:216] 18app_stars not exist'
+I1228 14:29:42.257841   29273 main.go:216] 19app_stars not exist'
+I1228 14:29:42.257921   29273 main.go:216] 20app_stars not exist'
+I1228 14:29:42.258086   29273 main.go:216] 22app_stars not exist'
+I1228 14:29:42.258165   29273 main.go:216] 23app_stars not exist'
+I1228 14:29:42.258168   29273 main.go:230] sum:24
+I1228 14:29:42.258698   29273 main.go:102] app search finish ok

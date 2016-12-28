@@ -1,0 +1,8 @@
+Log file created at: 2016/12/28 14:50:33
+Running on machine: hyhMac
+Binary: Built with gc go1.7.4 for darwin/amd64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I1228 14:50:33.673171   29609 main.go:78] StartWebSer...start
+I1228 14:50:44.171222   29609 main.go:259] https://play.google.com/store/apps/details?hr=en&id=com.king.farmheroessupersaga
+I1228 14:50:45.864062   29609 main.go:318] 0Everyone
+I1228 14:50:45.878283   29609 main.go:134] app detail finish ok
