@@ -4,7 +4,8 @@
 *.so
 *.sw*
 #vendor/
-#webgp
+webgp
+log
 
 
 

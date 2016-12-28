@@ -3,3 +3,104 @@ Running on machine: hyhMac
 Binary: Built with gc go1.7.4 for darwin/amd64
 Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
 I1228 15:39:11.468178   30405 main.go:75] StartWebSer...start
+I1228 16:26:00.434633   30405 main.go:235] sum:20
+I1228 16:26:00.434846   30405 main.go:104] app search finish ok
+I1228 16:26:33.796033   30405 main.go:235] sum:20
+I1228 16:26:33.796166   30405 main.go:104] app search finish ok
+I1228 16:27:35.837856   30405 main.go:235] sum:20
+I1228 16:27:35.837956   30405 main.go:104] app search finish ok
+I1228 16:55:48.779087   30405 main.go:218] 10app_stars not exist'
+I1228 16:55:48.779283   30405 main.go:218] 12app_stars not exist'
+I1228 16:55:48.779374   30405 main.go:218] 13app_stars not exist'
+I1228 16:55:48.779473   30405 main.go:218] 14app_stars not exist'
+I1228 16:55:48.779569   30405 main.go:218] 15app_stars not exist'
+I1228 16:55:48.779753   30405 main.go:218] 17app_stars not exist'
+I1228 16:55:48.779844   30405 main.go:218] 18app_stars not exist'
+I1228 16:55:48.780019   30405 main.go:218] 19app_stars not exist'
+I1228 16:55:48.780102   30405 main.go:218] 20app_stars not exist'
+I1228 16:55:48.780275   30405 main.go:218] 22app_stars not exist'
+I1228 16:55:48.780355   30405 main.go:218] 23app_stars not exist'
+I1228 16:55:48.780358   30405 main.go:235] sum:24
+I1228 16:55:48.780628   30405 main.go:104] app search finish ok
+I1228 16:56:07.540827   30405 main.go:255] https://play.google.com/store/apps/details?hr=en&id=com.king.farmheroessupersaga
+I1228 16:56:09.075908   30405 main.go:314] 0Everyone
+I1228 16:56:09.088956   30405 main.go:131] app detail finish ok
+E1228 18:14:54.987531   30405 main.go:205] 12 app_developer...not exist
+E1228 18:14:54.992728   30405 main.go:205] 15 app_developer...not exist
+E1228 18:14:54.992980   30405 main.go:205] 18 app_developer...not exist
+E1228 18:14:54.994128   30405 main.go:205] 30 app_developer...not exist
+E1228 18:14:54.994202   30405 main.go:205] 31 app_developer...not exist
+E1228 18:14:54.994273   30405 main.go:205] 32 app_developer...not exist
+E1228 18:14:54.994345   30405 main.go:205] 33 app_developer...not exist
+E1228 18:14:54.994417   30405 main.go:205] 34 app_developer...not exist
+E1228 18:14:54.994487   30405 main.go:205] 35 app_developer...not exist
+E1228 18:14:54.994558   30405 main.go:205] 36 app_developer...not exist
+E1228 18:14:54.994628   30405 main.go:205] 37 app_developer...not exist
+E1228 18:14:54.994699   30405 main.go:205] 38 app_developer...not exist
+E1228 18:14:54.994771   30405 main.go:205] 39 app_developer...not exist
+I1228 18:14:54.994943   30405 main.go:218] 41app_stars not exist'
+E1228 18:14:54.995000   30405 main.go:205] 42 app_developer...not exist
+I1228 18:14:54.995173   30405 main.go:218] 44app_stars not exist'
+E1228 18:14:54.995226   30405 main.go:205] 45 app_developer...not exist
+I1228 18:14:54.995400   30405 main.go:218] 47app_stars not exist'
+E1228 18:14:54.995462   30405 main.go:205] 48 app_developer...not exist
+I1228 18:14:54.995558   30405 main.go:235] sum:34
+I1228 18:14:54.996775   30405 main.go:104] app search finish ok
+E1228 18:17:16.072075   30405 main.go:205] 12 app_developer...not exist
+E1228 18:17:16.072562   30405 main.go:205] 15 app_developer...not exist
+E1228 18:17:16.072865   30405 main.go:205] 18 app_developer...not exist
+E1228 18:17:16.074086   30405 main.go:205] 30 app_developer...not exist
+E1228 18:17:16.074171   30405 main.go:205] 31 app_developer...not exist
+E1228 18:17:16.074248   30405 main.go:205] 32 app_developer...not exist
+E1228 18:17:16.074322   30405 main.go:205] 33 app_developer...not exist
+E1228 18:17:16.074396   30405 main.go:205] 34 app_developer...not exist
+E1228 18:17:16.074467   30405 main.go:205] 35 app_developer...not exist
+E1228 18:17:16.074539   30405 main.go:205] 36 app_developer...not exist
+E1228 18:17:16.074613   30405 main.go:205] 37 app_developer...not exist
+E1228 18:17:16.074684   30405 main.go:205] 38 app_developer...not exist
+E1228 18:17:16.074754   30405 main.go:205] 39 app_developer...not exist
+I1228 18:17:16.074927   30405 main.go:218] 41app_stars not exist'
+E1228 18:17:16.074983   30405 main.go:205] 42 app_developer...not exist
+I1228 18:17:16.075156   30405 main.go:218] 44app_stars not exist'
+E1228 18:17:16.075210   30405 main.go:205] 45 app_developer...not exist
+I1228 18:17:16.075384   30405 main.go:218] 47app_stars not exist'
+E1228 18:17:16.075440   30405 main.go:205] 48 app_developer...not exist
+I1228 18:17:16.075535   30405 main.go:235] sum:34
+I1228 18:17:16.075695   30405 main.go:104] app search finish ok
+E1228 18:17:25.476962   30405 main.go:205] 12 app_developer...not exist
+E1228 18:17:25.477220   30405 main.go:205] 15 app_developer...not exist
+E1228 18:17:25.477459   30405 main.go:205] 18 app_developer...not exist
+E1228 18:17:25.478623   30405 main.go:205] 30 app_developer...not exist
+E1228 18:17:25.478699   30405 main.go:205] 31 app_developer...not exist
+E1228 18:17:25.478770   30405 main.go:205] 32 app_developer...not exist
+E1228 18:17:25.478843   30405 main.go:205] 33 app_developer...not exist
+E1228 18:17:25.478913   30405 main.go:205] 34 app_developer...not exist
+E1228 18:17:25.478985   30405 main.go:205] 35 app_developer...not exist
+E1228 18:17:25.479056   30405 main.go:205] 36 app_developer...not exist
+E1228 18:17:25.479129   30405 main.go:205] 37 app_developer...not exist
+E1228 18:17:25.479200   30405 main.go:205] 38 app_developer...not exist
+E1228 18:17:25.479272   30405 main.go:205] 39 app_developer...not exist
+I1228 18:17:25.479463   30405 main.go:218] 41app_stars not exist'
+E1228 18:17:25.479518   30405 main.go:205] 42 app_developer...not exist
+I1228 18:17:25.479689   30405 main.go:218] 44app_stars not exist'
+E1228 18:17:25.479742   30405 main.go:205] 45 app_developer...not exist
+I1228 18:17:25.479915   30405 main.go:218] 47app_stars not exist'
+E1228 18:17:25.479971   30405 main.go:205] 48 app_developer...not exist
+I1228 18:17:25.480066   30405 main.go:235] sum:34
+I1228 18:17:25.480252   30405 main.go:104] app search finish ok
+I1228 18:29:27.533813   30405 main.go:218] 10app_stars not exist'
+I1228 18:29:27.534136   30405 main.go:218] 12app_stars not exist'
+I1228 18:29:27.534252   30405 main.go:218] 13app_stars not exist'
+I1228 18:29:27.534364   30405 main.go:218] 14app_stars not exist'
+I1228 18:29:27.534505   30405 main.go:218] 15app_stars not exist'
+I1228 18:29:27.534720   30405 main.go:218] 17app_stars not exist'
+I1228 18:29:27.534822   30405 main.go:218] 18app_stars not exist'
+I1228 18:29:27.534919   30405 main.go:218] 19app_stars not exist'
+I1228 18:29:27.535009   30405 main.go:218] 20app_stars not exist'
+I1228 18:29:27.535290   30405 main.go:218] 22app_stars not exist'
+I1228 18:29:27.535379   30405 main.go:218] 23app_stars not exist'
+I1228 18:29:27.535382   30405 main.go:235] sum:24
+I1228 18:29:27.537849   30405 main.go:104] app search finish ok
+I1228 18:29:35.435099   30405 main.go:255] https://play.google.com/store/apps/details?hr=en&id=com.king.farmheroessupersaga
+I1228 18:29:37.509362   30405 main.go:314] 0Everyone
+I1228 18:29:37.523976   30405 main.go:131] app detail finish ok

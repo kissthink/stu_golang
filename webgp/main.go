@@ -15,20 +15,9 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/golang/glog"
+	"errors"
+	"math/rand"
 )
-
-type AppBase struct {
-	Developer   string `json:"developer,omitempty"`
-	Icon        string `json:"icon,omitempty"`
-	Name        string `json:"name,omitempty"`
-	PackageName string `json:"package_name,omitempty"`
-}
-
-type AppInfo struct {
-	AppBase
-	DetailUrl   string `json:"detail_url,omitempty"`
-	ReviewStars string `json:"review_stars,omitempty"`
-}
 
 type DevLink struct {
 	Name string `json:"name,omitempty"`
@@ -36,25 +25,30 @@ type DevLink struct {
 }
 
 type AppInfoDetail struct {
-	AppBase
 	ApkType                string    `json:"apk_type,omitempty"`
 	ContentRating          dev.LStr  `json:"content_rating,omitempty"`
 	Category               string    `json:"category,omitempty"`
 	Description            string    `json:"description,omitempty"`
+	Developer              string    `json:"developer,omitempty"`
 	DescriptionShort       string    `json:"description_short,omitempty"`
 	DescriptionTranslation string    `json:"description_translation,omitempty"`
 	DeveloperId            string    `json:"developer_id,omitempty"`
 	DeveloperLink          []DevLink `json:"developer_link,omitempty"`
+	DetailUrl              string    `json:"detail_url,omitempty"`
 	Img                    dev.LStr  `json:"img,omitempty"`
+	Icon                   string    `json:"icon,omitempty"`
 	InstallCount1          int       `json:"install_count_1,omitempty"`
 	InstallCount2          int       `json:"install_count_2,omitempty"`
 	InteractiveElements    dev.LStr  `json:"interactive_elements,omitempty"`
 	InAppProducts          string    `json:"in_app_products,omitempty"`
+	Name                   string    `json:"name,omitempty"`
 	Price                  string    `json:"price,omitempty"`
+	PackageName            string    `json:"package_name,omitempty"`
 	ReviewStars            float64   `json:"review_stars,omitempty"`
 	ReviewCount            int       `json:"review_count,omitempty"`
-	PubliShed              bool      `json:"published,omitempty"`
-	PubliShedDate          string    `json:"published_date,omitempty"`
+	ReviewStarsSearch      string    `json:"review_stars_search,omitempty"`
+	Published              bool      `json:"published,omitempty"`
+	PublishedDate          string    `json:"published_date,omitempty"`
 	Tube                   string    `json:"tube,omitempty"`
 	TubeId                 string    `json:"tube_id,omitempty"`
 	Update                 string    `json:"update,omitempty"`
@@ -64,22 +58,42 @@ type AppInfoDetail struct {
 	VersionRequiresAndroid string    `json:"version_requires_android,omitempty"`
 }
 
+var IpPoll []*common.HttpClient
+
 func main() {
+	//初始化代理
+	//ipList := []string {"https://p.xgj.me:27035","ip://192.168.1.102"}
+	ipList := []string {"https://p.xgj.me:27035"}
+	if !ipPollInit(ipList) {
+		return
+	}
+
+	//初始化命令行参数
+	flag.Parse()
 	startWebSer()
+	defer glog.Flush()
+}
+
+func ipPollInit(ipList []string) bool {
+	IpPoll = make([]*common.HttpClient, 0, len(ipList))
+	for _, ip := range ipList {
+		//hc := common.NewHttpClient("ip://"+ip)
+		hc := common.NewHttpClient(ip)
+		if hc != nil {
+			IpPoll = append(IpPoll, hc)
+		}
+	}
+	return true
 }
 
 func startWebSer() {
-	//初始化命令行参数
-	flag.Parse()
-
 	glog.Info("StartWebSer...start")
 	http.HandleFunc("/search", AppSearch)    //设置search  app
 	http.HandleFunc("/details", AppDetail)   //设置detail  app
 	err := http.ListenAndServe(":8000", nil) //设置监听的端口
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		glog.Error("ListenAndServe: ", err)
 	}
-	//flag.Parse()
 }
 
 // url_base := "https://play.google.com/store/search?q=facebook"
@@ -90,46 +104,55 @@ func AppSearch(w http.ResponseWriter, r *http.Request) {
 		applist, err := search(q)
 		if err != nil {
 			glog.Errorln(err)
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprintf(w, "{err:'no data'}")
 			return
 		}
 		jsonBuf, err := json.Marshal(applist)
 		if err != nil {
 			glog.Errorln(err)
+			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintf(w, string(jsonBuf))
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonBuf)
 	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "{err:'no data'}")
 		glog.Warning("not found")
 	}
 	glog.Info("app search finish ok")
-	//退出时调用，确保日志写入文件中
-	defer glog.Flush()
 }
 
 //detail_url: "https://play.google.com/store/apps/details?id=com.tencent.mm",
 func AppDetail(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	w.Header().Set("Content-Type", "json")
 	if r.Method == "GET" {
 		id := r.Form.Get("id")
 		hl := r.Form.Get("hl")
 		appdetail, err := detail(id, hl)
 		if err != nil {
 			glog.Errorln(err)
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprintf(w, "{err:'no data'}")
 			return
 		}
 		jsonBuf, err := json.Marshal(appdetail)
 		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
 			glog.Errorln(err)
 			return
 		}
-		//glog.Info(string(jsonBuf))
-		//glog.Info("\n\n\n")
-		fmt.Fprintf(w, string(jsonBuf))
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonBuf)
 	} else {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "{err:'no data'}")
 		glog.Warning("not found")
 	}
 	glog.Info("app detail finish ok")
-	defer glog.Flush()
 }
 
 /////////////////////////
@@ -138,15 +161,10 @@ func AppDetail(w http.ResponseWriter, r *http.Request) {
 //		search("facebook") int {}
 //return:
 //		查询结果数量 & img_src_list
-func search(appName string) ([]*AppInfo, error) {
+func search(appName string) ([]*AppInfoDetail, error) {
+	hc := IpPoll[rand.Intn(len(IpPoll))]
 
-	hc := common.NewHttpClient("https://p.xgj.me:27035")
-	if hc == nil {
-		glog.Errorln("NewHttpClient..err")
-		return nil, nil
-	}
-
-	if len(appName) <= 0 {
+	if appName == "" {
 		glog.Errorln("query_app can't be empty")
 		return nil, nil
 	}
@@ -180,13 +198,17 @@ func search(appName string) ([]*AppInfo, error) {
 	}
 
 	sum := 0
-	resList := []*AppInfo{}
+	resList := []*AppInfoDetail{}
 	doc.Find(".card-content").Each(
 		func(i int, contentSelection *goquery.Selection) {
 			appDeatilUrl, errBool := contentSelection.ChildrenFiltered(".card-click-target").Attr("href")
 			if !errBool {
 				glog.Errorln(i, "app_detail_url...not exist")
 				return
+			}
+			appUrl, err := url.Parse(appDeatilUrl)
+			if err != nil {
+				glog.Errorln(err)
 			}
 
 			appIcon, errBool := contentSelection.Find(".cover-image").Attr("src")
@@ -205,30 +227,21 @@ func search(appName string) ([]*AppInfo, error) {
 				glog.Errorln(i, "app_developer...not exist")
 				return
 			}
-			appPackageArr := strings.Split(appDeatilUrl, "?id=")
 
-			appPackageName := ""
-			if len(appPackageArr) == 2 {
-				appPackageName = appPackageArr[1]
-			} else {
-				appPackageName = ""
-			}
+			appPackageName := appUrl.Query().Get("id")
 			appStars, errBool := contentSelection.Find(".tiny-star").Attr("aria-label")
 			if !errBool {
 				glog.Info(i, "app_stars not exist'")
 				appStars = "0"
 			}
 
-			appbase := AppBase{
-				Name:        strings.TrimSpace(appName),
-				Icon:        strings.TrimSpace(appIcon),
-				Developer:   strings.TrimSpace(appDeveloper),
-				PackageName: strings.TrimSpace(appPackageName),
-			}
-			resList = append(resList, &AppInfo{
-				AppBase:     appbase,
-				DetailUrl:   strings.TrimSpace(appDeatilUrl),
-				ReviewStars: strings.TrimSpace(appStars),
+			resList = append(resList, &AppInfoDetail{
+				Name:              strings.TrimSpace(appName),
+				Icon:              strings.TrimSpace(appIcon),
+				Developer:         strings.TrimSpace(appDeveloper),
+				PackageName:       strings.TrimSpace(appPackageName),
+				DetailUrl:         strings.TrimSpace(appDeatilUrl),
+				ReviewStarsSearch: strings.TrimSpace(appStars),
 			})
 			sum += 1
 		})
@@ -243,16 +256,13 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	}
 
 	q := u.Query()
-
-	if len(id) > 0 {
+	if id != "" {
 		q.Set("id", id)
 	}
-	if len(hr) > 0 {
+	if hr != "" {
 		q.Set("hr", hr)
 	}
-
 	u.RawQuery = q.Encode()
-	glog.Info(u)
 
 	req, e := http.NewRequest(
 		"GET",
@@ -260,12 +270,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 		nil,
 	)
 
-	hc := common.NewHttpClient("https://p.xgj.me:27035")
-	if hc == nil {
-		glog.Errorln("NewHttpClient..err")
-		return nil, nil
-	}
-
+	hc := IpPoll[rand.Intn(len(IpPoll))]
 	resp, e := hc.Do(req)
 	if e != nil {
 		glog.Errorln(e)
@@ -280,8 +285,12 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	}
 	appDetail := AppInfoDetail{}
 
-	appDetail.Name = strings.Replace(doc.Find(".id-app-title").Text(), " ", "", -1)
-	appDetail.Icon, _ = doc.Find(".cover-container .cover-image").Attr("src")
+	appDetail.Name = strings.TrimSpace(doc.Find(".id-app-title").Text())
+	Icon,errBool := doc.Find(".cover-container .cover-image").Attr("src")
+	if !errBool {
+		return nil, errors.New("no appDetail.Icon")
+	}
+	appDetail.Icon = Icon
 
 	//img
 	doc.Find(".thumbnails img.screenshot").Each(func(i int, contentSelection *goquery.Selection) {
@@ -293,7 +302,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	if !errBool {
 		appDetail.Category = ""
 		glog.Errorln("can't find appDetail.Category")
-		return nil, nil
+		return nil, errors.New("no category")
 	} else {
 		appDetail.Category = category
 	}
@@ -301,7 +310,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	//apk_type
 	appDetail.ApkType = "0"
 
-	if len(appDetail.Category) > 0 {
+	if appDetail.Category != "" {
 		category_arr := strings.Split(appDetail.Category, "category/")
 		if len(category_arr) >= 1 {
 			appDetail.Category = category_arr[1]
@@ -310,7 +319,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 
 	//content_rating
 	doc.Find("[itemprop=contentRating]").Each(func(i int, contentSelection *goquery.Selection) {
-		content_rating := strings.Replace(contentSelection.Text(), " ", "", -1)
+		content_rating := strings.TrimSpace(contentSelection.Text())
 		glog.Info(i, content_rating)
 		appDetail.ContentRating.Append(content_rating)
 	})
@@ -364,7 +373,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	appDetail.Price = price
 
 	//developer
-	appDetail.Developer = strings.Replace(doc.Find("div[itemprop=author] [itemprop=name]").Text(), " ", "", -1)
+	appDetail.Developer = strings.TrimSpace(doc.Find("div[itemprop=author] [itemprop=name]").Text())
 
 	//devulr
 	devurl, errBool := doc.Find("div[itemprop=author] [itemprop=url]").Attr("content")
@@ -380,12 +389,12 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	other_metadata.Find(".dev-link").Each(func(i int, contentSelection *goquery.Selection) {
 		app_devlink := DevLink{}
 		app_devlink.Href, _ = contentSelection.Attr("href")
-		app_devlink.Name = strings.Replace(contentSelection.Text(), " ", "", -1)
+		app_devlink.Name = strings.TrimSpace(contentSelection.Text())
 		appDetail.DeveloperLink = append(appDetail.DeveloperLink, app_devlink)
 	})
 
 	//install
-	install := strings.Replace(doc.Find("[itemprop=numDownloads]").Text(), " ", "", -1)
+	install := strings.TrimSpace(doc.Find("[itemprop=numDownloads]").Text())
 	install_arr := strings.Split(install, "-")
 	if len(install_arr) == 2 {
 		appDetail.InstallCount1, _ = strconv.Atoi(strings.Replace(install_arr[0], ",", "", -1))
@@ -395,16 +404,14 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	//interactive_elements
 	doc.Find(".meta-info").Each(func(i int, contentSelection *goquery.Selection) {
 		title := contentSelection.Find(".title").Text()
-		if len(title) > 0 {
+		if title != "" {
 			title = strings.TrimSpace(title)
 			//in_app_products
 			if title == "In-app Products" {
 				appDetail.InAppProducts = contentSelection.Find(".content").Text()
-				//glog.Info("in_app_products:", appDetail.In_app_products)
 			} else if title == "Interactive Elements" {
 				title_tmp := contentSelection.Find(".content").Text()
-				if len(title_tmp) > 0 {
-					//glog.Info("todo:", title_tmp)
+				if title_tmp != "'" {
 					appDetail.InteractiveElements = strings.Split(title_tmp, ", ")
 				}
 			}
@@ -413,13 +420,12 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	})
 
 	//published
-	appDetail.PubliShedDate = strings.Replace(doc.Find("[itemprop=datePublished]").Text(), " ", "", -1)
-	if len(appDetail.PubliShedDate) > 0 {
-		appDetail.PubliShed = true
-		appDetail.Update = appDetail.PubliShedDate
+	appDetail.PublishedDate = strings.TrimSpace(doc.Find("[itemprop=datePublished]").Text())
+	if appDetail.PublishedDate != "" {
+		appDetail.Published = true
+		appDetail.Update = appDetail.PublishedDate
 	} else {
-		appDetail.PubliShed = false
-		//TODO需要沟通, time名，模块提供时间
+		appDetail.Published = false
 		appDetail.Update = ""
 	}
 
@@ -453,15 +459,15 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 				glog.Errorln(err_tube_url)
 			}
 			appDetail.Tube = tube_url.String()
-			if len(tube_url.Path) > 0 {
+			if tube_url.Path != "" {
 				appDetail.TubeId = strings.Replace(tube_url.Path, "/embed/", "", 1)
 			}
 		}
 	})
 
 	//version
-	appDetail.VersionSize = strings.Replace(doc.Find("[itemprop=fileSize]").Text(), " ", "", -1)
-	appDetail.VersionCurrentVersion = strings.Replace(doc.Find("[itemprop=softwareVersion]").Text(), " ", "", -1)
+	appDetail.VersionSize = strings.TrimSpace(doc.Find("[itemprop=fileSize]").Text())
+	appDetail.VersionCurrentVersion = strings.TrimSpace(doc.Find("[itemprop=softwareVersion]").Text())
 	appDetail.VersionRequiresAndroid = strings.TrimSpace(doc.Find("[itemprop=operatingSystems]").Text())
 	appDetail.VersionDescription = doc.Find(".recent-change").Text()
 

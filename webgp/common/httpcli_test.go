@@ -10,8 +10,10 @@ import (
 )
 
 func TestHttpCliGet(t *testing.T) {
-	hc := NewHttpClient("https://p.xgj.me:27035")
-	url := "https://play.google.com/store/apps/search?q=qq"
+	//hc := NewHttpClient("https://p.xgj.me:27035")
+	hc := NewHttpClient("ip://192.168.1.102")
+	//url := "https://play.google.com/store/apps/search?q=qq"
+	url := "https://www.baidu.com"
 	req, e := http.NewRequest(
 		"Get",
 		url,

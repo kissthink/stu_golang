@@ -160,20 +160,14 @@ func NewHttpClient(proxyAddr string) *HttpClient {
 		}
 		return nil
 	}
+	c.Client.Transport = MakeTransportX(c.ProxyAddr)
 
 	//	c.Client.Timeout = 75 * time.Second
 	return c
 }
 
-func (hc *HttpClient) mkTransport() {
-	if hc.Client.Transport != nil || hc.ProxyAddr == "" {
-		return
-	}
-	hc.Client.Transport = MakeTransportX(hc.ProxyAddr)
-}
 
 func (hc *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
-	hc.mkTransport()
 	return hc.Client.Do(req)
 }
 
