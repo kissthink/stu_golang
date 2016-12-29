@@ -3,20 +3,20 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"flag"
+	"errors"
+	"math/rand"
+	"time"
+	"webgp/waiter"
 	"webgp/common"
 	"webgp/dev"
 
-	"flag"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/golang/glog"
-	"errors"
-	"math/rand"
 )
 
 type DevLink struct {
@@ -63,7 +63,7 @@ var IpPoll []*common.HttpClient
 func main() {
 	//初始化代理
 	//ipList := []string {"https://p.xgj.me:27035","ip://192.168.1.102"}
-	ipList := []string {"https://p.xgj.me:27035"}
+	ipList := []string{"https://p.xgj.me:27035"}
 	if !ipPollInit(ipList) {
 		return
 	}
@@ -80,6 +80,10 @@ func ipPollInit(ipList []string) bool {
 		//hc := common.NewHttpClient("ip://"+ip)
 		hc := common.NewHttpClient(ip)
 		if hc != nil {
+			//WaiterHc = append(WaiterHc, waiter.NewBurstLimitTick(time.Second, 3))
+			hc.Waiter = waiter.NewBurstLimitTick(time.Second, 3)
+			//预先执行
+			time.Sleep(3 * time.Second)
 			IpPoll = append(IpPoll, hc)
 		}
 	}
@@ -162,7 +166,10 @@ func AppDetail(w http.ResponseWriter, r *http.Request) {
 //return:
 //		查询结果数量 & img_src_list
 func search(appName string) ([]*AppInfoDetail, error) {
-	hc := IpPoll[rand.Intn(len(IpPoll))]
+	// TODO num 后期修改
+	num := rand.Intn(len(IpPoll))
+	hc := IpPoll[num]
+	<-hc.Waiter.GetC()
 
 	if appName == "" {
 		glog.Errorln("query_app can't be empty")
@@ -249,18 +256,18 @@ func search(appName string) ([]*AppInfoDetail, error) {
 	return resList, nil
 }
 
-func detail(id string, hr string) (*AppInfoDetail, error) {
+func detail(id string, hl string) (*AppInfoDetail, error) {
 	u, err := url.Parse("https://play.google.com/store/apps/details")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	q := u.Query()
 	if id != "" {
 		q.Set("id", id)
 	}
-	if hr != "" {
-		q.Set("hr", hr)
+	if hl != "" {
+		q.Set("hl", hl)
 	}
 	u.RawQuery = q.Encode()
 
@@ -270,7 +277,11 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 		nil,
 	)
 
-	hc := IpPoll[rand.Intn(len(IpPoll))]
+	// TODO num 需要修改
+	num := rand.Intn(len(IpPoll))
+	hc := IpPoll[num]
+	<-hc.Waiter.GetC()
+
 	resp, e := hc.Do(req)
 	if e != nil {
 		glog.Errorln(e)
@@ -286,7 +297,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	appDetail := AppInfoDetail{}
 
 	appDetail.Name = strings.TrimSpace(doc.Find(".id-app-title").Text())
-	Icon,errBool := doc.Find(".cover-container .cover-image").Attr("src")
+	Icon, errBool := doc.Find(".cover-container .cover-image").Attr("src")
 	if !errBool {
 		return nil, errors.New("no appDetail.Icon")
 	}
@@ -378,7 +389,7 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	//devulr
 	devurl, errBool := doc.Find("div[itemprop=author] [itemprop=url]").Attr("content")
 	if !errBool {
-		log.Println("devurl..not exist")
+		glog.Info("devurl..not exist")
 	} else {
 		devurl_arr := strings.Split(devurl, "id=")
 		if len(devurl_arr) >= 1 {
@@ -402,22 +413,26 @@ func detail(id string, hr string) (*AppInfoDetail, error) {
 	}
 
 	//interactive_elements
-	doc.Find(".meta-info").Each(func(i int, contentSelection *goquery.Selection) {
-		title := contentSelection.Find(".title").Text()
-		if title != "" {
-			title = strings.TrimSpace(title)
-			//in_app_products
-			if title == "In-app Products" {
-				appDetail.InAppProducts = contentSelection.Find(".content").Text()
-			} else if title == "Interactive Elements" {
-				title_tmp := contentSelection.Find(".content").Text()
-				if title_tmp != "'" {
-					appDetail.InteractiveElements = strings.Split(title_tmp, ", ")
+	if hl == "en"{
+		doc.Find(".meta-info").Each(func(i int, contentSelection *goquery.Selection) {
+			title := contentSelection.Find(".title").Text()
+			if title != "" {
+				title = strings.TrimSpace(title)
+				//in_app_products
+				if title == "In-app Products" {
+					appDetail.InAppProducts = contentSelection.Find(".content").Text()
+				} else if title == "Interactive Elements" {
+					title_tmp := contentSelection.Find(".content").Text()
+					if title_tmp != "'" {
+						appDetail.InteractiveElements = strings.Split(title_tmp, ", ")
+					}
 				}
 			}
-		}
 
-	})
+		})
+	} else{
+		// TODO
+	}
 
 	//published
 	appDetail.PublishedDate = strings.TrimSpace(doc.Find("[itemprop=datePublished]").Text())

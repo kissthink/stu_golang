@@ -13,11 +13,13 @@ import (
 	"context"
 	"io/ioutil"
 	"log"
+	"webgp/waiter"
 )
 
 type HttpClient struct {
 	ProxyAddr string
 	Client    http.Client
+	Waiter    *waiter.BurstLimitTick
 }
 
 const (
@@ -165,7 +167,6 @@ func NewHttpClient(proxyAddr string) *HttpClient {
 	//	c.Client.Timeout = 75 * time.Second
 	return c
 }
-
 
 func (hc *HttpClient) Do(req *http.Request) (resp *http.Response, err error) {
 	return hc.Client.Do(req)

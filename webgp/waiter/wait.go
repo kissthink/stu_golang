@@ -1,13 +1,8 @@
-package main
+package waiter
 
 import (
-	"time"
 	"sync"
-) gplay
-
-import (
-"sync"
-"time"
+	"time"
 )
 
 type BurstLimitTick struct {
@@ -51,7 +46,7 @@ func (rrm *RateLimit) GetThrottle(key string) <-chan time.Time {
 
 func NewBurstLimitTick(rate time.Duration, burstLimit int) *BurstLimitTick {
 	blt := &BurstLimitTick{
-		tick:time.NewTicker(rate),
+		tick:       time.NewTicker(rate),
 		burstLimit: burstLimit,
 	}
 	if burstLimit > 0 {
@@ -62,7 +57,7 @@ func NewBurstLimitTick(rate time.Duration, burstLimit int) *BurstLimitTick {
 				case blt.burstLimitC <- t:
 				default:
 				}
-			}  // exits after blt.tick.Stop()
+			} // exits after blt.tick.Stop()
 		}()
 	}
 	return blt
@@ -79,4 +74,3 @@ func (blt *BurstLimitTick) GetC() <-chan time.Time {
 		return blt.tick.C
 	}
 }
-

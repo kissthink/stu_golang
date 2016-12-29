@@ -6,7 +6,10 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"sync"
 	"testing"
+	"time"
+	"webgp/waiter"
 )
 
 func TestHttpCliGet(t *testing.T) {
@@ -53,4 +56,24 @@ func TestHttpCliPath(t *testing.T) {
 	rawStr := fmt.Sprintf("%s%s%s", resUri, key, path)
 
 	fmt.Println(rawStr)
+}
+
+func TestHttpCliGetWaiter(t *testing.T) {
+	//hc := NewHttpClient("https://p.xgj.me:27035")
+	var wg sync.WaitGroup
+	hc := NewHttpClient("ip://192.168.1.102")
+	hc.Waiter = waiter.NewBurstLimitTick(time.Second, 3)
+	time.Sleep(3 * time.Second)
+	b := time.Now()
+
+	for i := 0; i < 9; i++ {
+		wg.Add(1)
+		go func() {
+			<-hc.Waiter.GetC()
+			println("i:", i, time.Now().String())
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	fmt.Println(time.Since(b))
 }
